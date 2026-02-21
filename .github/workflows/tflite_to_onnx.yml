@@ -2,10 +2,6 @@ name: Convert TFLite to ONNX
 
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - "inputs/**"
-      - ".github/workflows/tflite_to_onnx.yml"
 
 jobs:
   convert:
@@ -24,21 +20,29 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install conversion toolchain
+      - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          python -m pip install onnx==1.14.1 protobuf==3.20.3 numpy==1.26.4
-          python -m pip install tflite==2.10.0 tflite2onnx==0.4.1
-          python -m pip install onnxsim
+          python -m pip install "numpy<2" onnx onnxsim
 
-      - name: Attempt conversion (tflite2onnx)
+      - name: Install pinto0309/tflite2onnx
+        run: |
+          set -euxo pipefail
+          git clone --depth 1 https://github.com/PINTO0309/tflite2onnx.git
+          cd tflite2onnx
+          python -m pip install -r requirements.txt
+          python -m pip install .
+
+      - name: Convert
         run: |
           set -euxo pipefail
           mkdir -p outputs
-          python -m tflite2onnx.convert \
-            --input inputs/selfie_multiclass_256x256.tflite \
-            --output outputs/selfie_multiclass_256x256.onnx
+          python -m tflite2onnx \
+            --input_path inputs/selfie_multiclass_256x256.tflite \
+            --output_path outputs/selfie_multiclass_256x256.onnx
+
           ls -lah outputs
+          test -f outputs/selfie_multiclass_256x256.onnx
 
       - name: Simplify ONNX (optional)
         run: |
@@ -50,4 +54,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: selfie_multiclass_256x256_onnx
+          path: outputs/_onnx
           path: outputs/
