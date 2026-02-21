@@ -50,9 +50,8 @@ jobs:
           python -m onnxsim outputs/selfie_multiclass_256x256.onnx outputs/selfie_multiclass_256x256.sim.onnx || true
           ls -lah outputs
 
-      - name: Upload outputs
+            - name: Upload outputs
         uses: actions/upload-artifact@v4
         with:
           name: selfie_multiclass_256x256_onnx
-          path: outputs/_onnx
           path: outputs/
