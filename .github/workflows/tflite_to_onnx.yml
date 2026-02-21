@@ -56,6 +56,3 @@ jobs:
           name: selfie_multiclass_256x256_onnx
           path: outputs/_onnx
           path: outputs/
-          name: selfie_multiclass_256x256_onnx
-          path: outputs/_onnx
-          path: outputs/
